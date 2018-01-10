@@ -56,19 +56,6 @@ int BP[] = {
   WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL
 };
 
-int BP1[] = {
-  WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL,
-  WALL,120,-40,4,-1,-1,4,-40,120,
-  WALL,-40,-60,-5,-5,-5,-5,-60,-40,
-  WALL,4,-5,2,-1,-1,2,-5,4,
-  WALL,-1,-5,-1,0,0,-1,-5,-1,
-  WALL,-1,-5,-1,0,0,-1,-5,-1,
-  WALL,4,-5,2,-1,-1,2,-5,4,
-  WALL,-40,-60,-5,-5,-5,-5,-60,-40,
-  WALL,120,-40,4,-1,-1,4,-40,120,
-  WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL,WALL
-};
-
 int canPut[8];
 int stack[1000];
 int sp=0;
