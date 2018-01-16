@@ -10,6 +10,7 @@ int PlayerSelect(int);
 int PlayerChange(int);
 int Number();
 int Value(int,int);
+int Value1(int,int);
 void BoardPrint();
 void Reverse(int,int);
 void push(int);
@@ -27,6 +28,7 @@ void AI_Reverse(int,int);
 void Undo();
 int MinMax(int,int,int,int);
 int AlhpaBeta(int,int,int,int,int,int);
+int AlhpaBeta1(int,int,int,int,int,int);
 int Pass(int);
 void finish();
 void NumberPrint(int);
@@ -114,7 +116,11 @@ int main(void){
 
     pass = Pass(player);
     if(pass == 0){
-      AINum = AlhpaBeta(5,player,AI,-10000,10000,count);
+      if(count < 52){
+        AINum = AlhpaBeta(5,player,AI,-10000,10000,count);
+      }else{
+        AINum = AlhpaBeta1(15,player,AI,-10000,10000,count);
+      }
       NumberPrint(AINum);
       b = Search(AINum,player);
       Reverse(AINum,player);
@@ -262,15 +268,14 @@ void finish(){
 }
 
 void NumberPrint(int number){
-  int i,box;
+  int i;
+  int box = 0;
   printf("コンピュータの手");
   for(i=10;i<100;i+=9){
     box = number - i;
     if(box<10){
       switch(box){
-        case 0:
-          printf("a,");
-          break;
+
         case 1:
           printf("b,");
           break;
@@ -291,6 +296,9 @@ void NumberPrint(int number){
           break;
         case 7:
           printf("h,");
+          break;
+        default:
+          printf("a,");
           break;
       }
       switch(i){
@@ -323,49 +331,7 @@ void NumberPrint(int number){
     }
   }
 }
-int MinMax(int depth,int player,int AI,int count){
-  int i,a;
-  int isPut = 0;
-  int value;
-  int childValue;
-  int bestNumber;
 
-  //末端に来た時
-  if(depth == 0){
-    return Value(player,count);
-  }
-  if(player == AI){
-    value = -100;
-  }else{
-    value = 100;
-  }
-  for(i=10;i<81;i++){
-    isPut = Search(i,player);
-    if(isPut == 1){
-      //探索
-      AI_Reverse(i,player);
-      childValue = MinMax(depth-1,-player,AI,count+1);
-      if(player == AI){
-        if(childValue >value){
-          value = childValue;
-          bestNumber = i;
-        }
-      }else{
-        if(childValue < value){
-          value = childValue;
-          bestNumber = i;
-        }
-      }
-    Undo();
-    }
-
-  }
-  if(depth == 6){
-    return bestNumber;
-  }else{
-    return value;
-  }
-}
 
 //打つ場所を決める
 int AlhpaBeta(int depth,int player,int AI,int alhpa,int beta,int count){
@@ -437,6 +403,75 @@ int AlhpaBeta(int depth,int player,int AI,int alhpa,int beta,int count){
   }
 }
 
+int AlhpaBeta1(int depth,int player,int AI,int alhpa,int beta,int count){
+  int i,a;
+  int isPut = 0;
+  int value;
+  int childValue;
+  int bestNumber;
+  int pass;
+
+  //末端に来た時
+  if(depth == 0){
+    return Value1(player,count);
+  }
+  pass=Pass(player);
+  if(pass==1){
+
+    player = -player;
+    pass = Pass(player);
+    if(pass==1){
+      return Value1(player,count);
+    }
+  }
+  if(player == AI){
+    value = -1000;
+  }else{
+    value = 1000;
+  }
+  for(i=10;i<81;i++){
+    isPut = Search(i,player);
+    if(isPut == 1){
+      //探索
+      AI_Reverse(i,player);
+
+      childValue = AlhpaBeta1(depth-1,-player,AI,alhpa,beta,count+1);
+      if(player == AI){
+        if(childValue >value){
+          value = childValue;
+          alhpa = value;
+
+          bestNumber = i;
+
+
+        }
+        if(value>beta){
+          Undo();
+          return value;
+        }
+      }else{
+        if(childValue < value){
+          value = childValue;
+          beta = value;
+
+          bestNumber = i;
+
+        }
+        if(value < alhpa){
+          Undo();
+          return value;
+        }
+      }
+    Undo();
+    }
+  }
+  if(depth == 15){
+    return bestNumber;
+  }else{
+    return value;
+  }
+}
+
 //評価
 int Value(int player,int count){
   int value = 0;
@@ -452,20 +487,23 @@ int Value(int player,int count){
   }
 
   if(player == 1){
-    if(count < 40){
       //printf("黒の評価%d\n",value*3+put*5-sum);
-      return -value*3-2*put+sum;
-    }else{
-      return -value*3-2*put-2*sum;
-    }
+      return -value*2-2*put+sum;
   }else{
-    if(count < 40){
-      //printf("白の評価%d\n",-value);
-      return value*3+2*put-sum;
-    }else{
-      return value*3+2*put+2*sum;
+      return value*2+2*put-sum;
     }
 }
+
+int Value1(int player,int count){
+  int i;
+  int sum = 0;
+  for(i = 10;i<81;i++){
+    if(board[i]==player){
+      sum++;
+    }
+
+}
+return sum;
 }
 
 //もとに戻す
